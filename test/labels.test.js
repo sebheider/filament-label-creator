@@ -36,14 +36,21 @@ test('renders a safe 300 dpi PNG with requested physical size', async () => {
   const portrait = await sharp(await renderPng(validateLabel(label), 70, 110)).metadata();
   assert.equal(portrait.width, Math.round(70 / 25.4 * 300));
   assert.equal(portrait.height, Math.round(110 / 25.4 * 300));
+  const textured = await renderPng(validateLabel({ ...label, colors: ['#1685c5'], colorName: 'Azure Blue' }), 70, 110);
+  const { data: textureData, info: textureInfo } = await sharp(textured).raw().toBuffer({ resolveWithObject: true });
+  const textureX = Math.round(textureInfo.width * 550 / 700);
+  const textureY = Math.round(textureInfo.height * 500 / 1100);
+  const texturePixel = [...textureData.subarray((textureY * textureInfo.width + textureX) * textureInfo.channels,
+    (textureY * textureInfo.width + textureX) * textureInfo.channels + 3)];
+  assert.notDeepEqual(texturePixel, [0x16, 0x85, 0xc5], 'the generated texture adds highlights to the selected colour');
   const malicious = validateLabel({ ...label, name: '<image href="https://evil.example"/>' });
   assert.ok((await renderPng(malicious, 30, 20)).length > 1000);
   const striped = await renderPng(validateLabel({ ...label, colors: ['#ff0000', '#0000ff'], colorName: 'Rot / Blau' }), 70, 40);
   const { data, info } = await sharp(striped).raw().toBuffer({ resolveWithObject: true });
-  const pixel = x => [...data.subarray((Math.round(info.height * 170 / 400) * info.width + x) * info.channels,
-    (Math.round(info.height * 170 / 400) * info.width + x) * info.channels + 3)];
+  const pixel = x => [...data.subarray((Math.round(info.height * 202 / 400) * info.width + x) * info.channels,
+    (Math.round(info.height * 202 / 400) * info.width + x) * info.channels + 3)];
   assert.deepEqual(pixel(Math.round(info.width * 0.25)), [255, 0, 0], 'first colour on the left half of the bar');
-  assert.deepEqual(pixel(Math.round(info.width * 0.52)), [0, 0, 255], 'second colour before the filament texture');
+  assert.deepEqual(pixel(Math.round(info.width * 0.52)), [0, 0, 255], 'second colour in the palette strip');
 });
 
 test('A4 layout respects margins, label sizes and pagination', async () => {

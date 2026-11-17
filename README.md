@@ -42,9 +42,10 @@ gespeichert. Der Port kann in `compose.yaml` angepasst werden.
    Im Druckdialog **100 % / Tatsächliche Größe** wählen, nicht „An Seite anpassen“.
 
 Bis zu 30 Filamente pro Durchlauf; Labelbreite 30–190 mm, Höhe 20–277 mm.
-Das Standardformat ist 70 × 110 mm im Hochformat. Etiketten zeigen Material,
-Farbflächen und Druckwerte mit passenden Icons; sehr schmale oder hohe Formate
-erhalten weiße Freiflächen, damit die Gestaltung unverzerrt bleibt.
+Das Standardformat ist 70 × 110 mm im Hochformat. Generierte Produktbilder von
+Spule und Filamenttextur werden mit den dynamischen Materialdaten, Farbflächen und
+passenden Icons kombiniert. Sehr schmale oder hohe Formate erhalten weiße
+Freiflächen, damit die Gestaltung unverzerrt bleibt.
 PNG-Abmessungen werden auf ganze Pixel gerundet.
 
 ## Online-Daten und Grenzen
