@@ -33,13 +33,17 @@ test('renders a safe 300 dpi PNG with requested physical size', async () => {
   assert.equal(metadata.width, Math.round(70 / 25.4 * 300));
   assert.equal(metadata.height, Math.round(40 / 25.4 * 300));
   assert.equal(metadata.density, 300);
+  const portrait = await sharp(await renderPng(validateLabel(label), 70, 110)).metadata();
+  assert.equal(portrait.width, Math.round(70 / 25.4 * 300));
+  assert.equal(portrait.height, Math.round(110 / 25.4 * 300));
   const malicious = validateLabel({ ...label, name: '<image href="https://evil.example"/>' });
   assert.ok((await renderPng(malicious, 30, 20)).length > 1000);
   const striped = await renderPng(validateLabel({ ...label, colors: ['#ff0000', '#0000ff'], colorName: 'Rot / Blau' }), 70, 40);
   const { data, info } = await sharp(striped).raw().toBuffer({ resolveWithObject: true });
-  const pixel = x => [...data.subarray((10 * info.width + x) * info.channels, (10 * info.width + x) * info.channels + 3)];
+  const pixel = x => [...data.subarray((Math.round(info.height * 170 / 400) * info.width + x) * info.channels,
+    (Math.round(info.height * 170 / 400) * info.width + x) * info.channels + 3)];
   assert.deepEqual(pixel(Math.round(info.width * 0.25)), [255, 0, 0], 'first colour on the left half of the bar');
-  assert.deepEqual(pixel(Math.round(info.width * 0.75)), [0, 0, 255], 'second colour on the right half');
+  assert.deepEqual(pixel(Math.round(info.width * 0.52)), [0, 0, 255], 'second colour before the filament texture');
 });
 
 test('A4 layout respects margins, label sizes and pagination', async () => {
