@@ -18,6 +18,14 @@ test('API validates input, handles batches and delivers image/PDF downloads', as
   const result = await post('/api/lookup', { width: 70, height: 40, filaments });
   assert.equal(result.status, 200);
   assert.equal((await result.json()).labels.length, 2);
+  const parsed = await post('/api/lookup', { width: 70, height: 40, defaultColor: '#abcdef',
+    filaments: [{ name: 'Elegoo PLA tri color blau/rot/grün' }, { name: 'Polymaker PolyTerra PLA' }] });
+  const [tri, plain] = (await parsed.json()).labels;
+  assert.equal(tri.name, 'Elegoo PLA tri color');
+  assert.equal(tri.colorName, 'Blau / Rot / Grün');
+  assert.equal(tri.colors.length, 3);
+  assert.equal(tri.color, tri.colors[0]);
+  assert.deepEqual(plain.colors, ['#abcdef'], 'default colour for lines without colour words');
   const image = await post('/api/label', { width: 70, height: 40, label: filaments[0] });
   assert.equal(image.headers.get('content-type'), 'image/png');
   assert.equal(Buffer.from(await image.arrayBuffer()).subarray(1, 4).toString(), 'PNG');

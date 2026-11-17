@@ -33,10 +33,10 @@
           </div>
           <form id="lookup-form">
             <label for="filaments">Filamentliste <span class="label-aside">max. 30</span></label>
-            <textarea id="filaments" name="filaments" rows="7" placeholder="Bambu PLA Basic; #e87939&#10;Prusament PETG&#10;Polymaker PolyTerra PLA" aria-describedby="filaments-help" required></textarea>
-            <div class="field-help" id="filaments-help">Hersteller und Filamentname eingeben. Optional: <code>; #HEX-Farbe</code> pro Zeile.</div>
+            <textarea id="filaments" name="filaments" rows="7" placeholder="Prusament PETG schwarz&#10;Bambu Lab PLA Basic grau&#10;SainSmart TPU blau&#10;Elegoo PLA tri color blau/rot/grün" aria-describedby="filaments-help" required></textarea>
+            <div class="field-help" id="filaments-help">Hersteller, Filament und Farbe in Worten, z. B. <code>Prusament PETG schwarz</code>. Mehrfarbig: <code>blau/rot/grün</code>. Auch <code>dunkelblau</code> oder ein Hex-Wert wie <code>#e87939</code> klappt.</div>
             <div class="color-row">
-              <div><label for="default-color">Standardfarbe</label><p>Für Zeilen ohne eigene Farbe</p></div>
+              <div><label for="default-color">Standardfarbe</label><p>Für Zeilen ohne erkannte Farbe</p></div>
               <div class="color-control"><input id="default-color" type="color" value="#e87939" aria-label="Standardfarbe auswählen"><span id="color-value">#E87939</span></div>
             </div>
             <fieldset class="dimensions">
@@ -93,7 +93,7 @@
 
       <section class="how-to" aria-labelledby="how-to-title">
         <div class="how-to-intro"><span class="eyebrow">VON DER LISTE AN DIE SPULE</span><h2 id="how-to-title">In drei kleinen Schritten.</h2></div>
-        <div class="how-step"><span>01 /</span><h3>Filamente eintragen</h3><p>Namen und optional eine Farbe ergänzen. Auch mehrere auf einmal.</p></div>
+        <div class="how-step"><span>01 /</span><h3>Filamente eintragen</h3><p>Name und Farbe einfach in Worten – auch mehrfarbig und mehrere auf einmal.</p></div>
         <div class="how-step"><span>02 /</span><h3>Details feinjustieren</h3><p>Gefundene Daten prüfen und deine Etiketten nach Wunsch bearbeiten.</p></div>
         <div class="how-step"><span>03 /</span><h3>Drucken &amp; aufkleben</h3><p>Einzeln als PNG oder zusammen als druckfertiges A4-PDF exportieren.</p></div>
       </section>

@@ -19,6 +19,11 @@ test('validates sizes, label counts, text and colors', () => {
   assert.throws(() => validateLabel({ ...label, name: 'a'.repeat(121) }));
   assert.throws(() => validateLabel({ ...label, density: {} }));
   assert.equal(validateLabel({ name: 'PLA', color: '#123456' }).bed, '');
+  const multi = validateLabel({ ...label, colors: ['#112233', '#445566'], colorName: 'Blau / Rot' });
+  assert.deepEqual([multi.color, multi.colors, multi.colorName], ['#112233', ['#112233', '#445566'], 'Blau / Rot']);
+  for (const colors of [[], Array(5).fill('#123456'), ['#123456', 'red']]) {
+    assert.throws(() => validateLabel({ ...label, colors }));
+  }
 });
 
 test('renders a safe 300 dpi PNG with requested physical size', async () => {
@@ -30,6 +35,11 @@ test('renders a safe 300 dpi PNG with requested physical size', async () => {
   assert.equal(metadata.density, 300);
   const malicious = validateLabel({ ...label, name: '<image href="https://evil.example"/>' });
   assert.ok((await renderPng(malicious, 30, 20)).length > 1000);
+  const striped = await renderPng(validateLabel({ ...label, colors: ['#ff0000', '#0000ff'], colorName: 'Rot / Blau' }), 70, 40);
+  const { data, info } = await sharp(striped).raw().toBuffer({ resolveWithObject: true });
+  const pixel = x => [...data.subarray((10 * info.width + x) * info.channels, (10 * info.width + x) * info.channels + 3)];
+  assert.deepEqual(pixel(Math.round(info.width * 0.25)), [255, 0, 0], 'first colour on the left half of the bar');
+  assert.deepEqual(pixel(Math.round(info.width * 0.75)), [0, 0, 255], 'second colour on the right half');
 });
 
 test('A4 layout respects margins, label sizes and pagination', async () => {
