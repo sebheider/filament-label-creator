@@ -1,0 +1,21 @@
+{
+  "name": "filament-label-creator",
+  "version": "1.0.0",
+  "description": "A small tool for docker-compose installations which helps to create labels for your filament library.",
+  "private": true,
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test",
+    "check": "node --check server.js && node --check lib/catalog.js && node --check lib/labels.js && node --check lib/spoolman.js"
+  },
+  "engines": { "node": ">=22.12.0" },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "pdf-lib": "1.17.1",
+    "sharp": "0.35.5"
+  }
+}
