@@ -39,19 +39,45 @@ Labelgestaltung unverzerrt bleibt. PNG-Abmessungen werden auf ganze Pixel gerund
 
 ## Online-Daten und Grenzen
 
-Die Anwendung durchsucht die öffentliche
-[OrcaSlicer-Filamentbibliothek](https://github.com/SoftFever/OrcaSlicer/tree/main/resources/profiles/OrcaFilamentLibrary)
-nach dem Produktnamen und löst die Vererbung der Profile auf. Bambu-Lab- und
-Polymaker-Namenspräfixe werden normalisiert. Profile und Katalog werden für eine
-Stunde im Arbeitsspeicher zwischengespeichert. Quellenlinks führen zum verwendeten
-Profil, dessen `inherits`-Eintrag auf Basisprofile verweist.
+Die Anwendung fragt feste, öffentliche Datenquellen in dieser Reihenfolge ab:
 
-**Dies sind Community-Slicerprofile, keine garantierten Herstellerdatenblätter.**
-Düsentemperaturen sind bevorzugt der Profilbereich, alternativ der Sollwert;
-die Betttemperatur stammt aus `hot_plate_temp` (beheizte Platte).
-Durchmesser und Dichte können aus Basisprofilen geerbt sein. Die Werte hängen
-unter anderem von Drucker, Druckplatte und Filamentvariante ab und müssen vor
-Verwendung geprüft werden. Keine umfassende Suche über beliebige Internetseiten.
+1. **[SpoolmanDB](https://github.com/Donkie/SpoolmanDB)** (MIT): Herstellerangaben
+   (Temperaturbereiche, Dichte, Durchmesser) u. a. für Prusament/Prusa, Bambu Lab,
+   Polymaker, eSUN, Sunlu, Elegoo, Creality, Anycubic, Overture, Hatchbox, Eryone,
+   Geeetech, Flashforge, Jayo, Kingroon, Extrudr, Fillamentum, Fiberlogy,
+   Formfutura, Das Filament, Devil Design, 3DJake, Proto-pasta, Inland,
+   AmazonBasics, Qidi, Snapmaker, Spectrum, Verbatim, add:north, Zyltech, 3DXTech,
+   AzureFilm, Artillery, BIQU, Kexcelled und Tinmorry.
+2. **[OrcaSlicer-Filamentbibliothek](https://github.com/SoftFever/OrcaSlicer/tree/main/resources/profiles/OrcaFilamentLibrary)**:
+   produktspezifisches Slicerprofil inklusive aufgelöster Profilvererbung.
+3. **[SpoolmanDB-Community](https://github.com/Icezaza2543/SpoolmanDB-Community)**
+   (MIT, junger, ungeprüfter Community-Fork): ergänzt u. a. **MakerBot**,
+   **SainSmart**, ColorFabb, MatterHackers, UltiMaker, Raise3D, NinjaTek,
+   Atomic Filament, Recreus, Sovol und Amolen. Treffer werden besonders gekennzeichnet.
+4. Generisches OrcaSlicer-Materialprofil (siehe unten).
+
+Für SpoolmanDB muss die Eingabe mit dem Markennamen beginnen (z. B.
+`Prusament PETG`, `Bambu Lab PLA Matte`, `MakerBot Tough PLA`,
+`SainSmart GT-3 Matte PLA`). Die Herstellerdatei wird ausschließlich über eine
+feste Markentabelle ausgewählt. Produktwörter, Material und Effekte (z. B. Matte,
+Silk, Glow) müssen zum Eintrag passen; zusätzlich sind Farbnamen aus der Datenbank
+oder einfache Farbwörter (z. B. „Schwarz“, „Red“) erlaubt. Unbekannte Produktwörter
+führen nicht zu einem Ersatztreffer, sondern zur nächsten Quelle. Passen mehrere
+Einträge mit abweichenden Werten, erscheint ein Hinweis. Für MakerBot und SainSmart
+wurden keine anderen frei maschinenlesbaren Datenquellen gefunden (weder in
+OrcaSlicer, PrusaSlicer noch Cura).
+
+Alle Daten werden für eine Stunde im Arbeitsspeicher zwischengespeichert,
+Fernwerte auf plausible Bereiche geprüft und Quellenlinks führen zur verwendeten
+Datei bzw. zum verwendeten Profil (dessen `inherits`-Eintrag auf Basisprofile verweist).
+
+**Dies sind Community-gepflegte Daten bzw. Slicerprofile, keine garantierten
+Herstellerdatenblätter.** Düsen- und Betttemperaturen sind bevorzugt der
+angegebene Bereich, alternativ der Sollwert; bei OrcaSlicer stammt die
+Betttemperatur aus `hot_plate_temp` (beheizte Platte). Durchmesser und Dichte
+können aus Basisprofilen geerbt sein. Die Werte hängen unter anderem von Drucker,
+Druckplatte und Filamentvariante ab und müssen vor Verwendung geprüft werden.
+Keine umfassende Suche über beliebige Internetseiten.
 
 Ohne Produkttreffer wird, sofern vorhanden, ein **klar gekennzeichnetes generisches
 Materialprofil** verwendet. Unbekannte Materialien, fehlende Werte und
