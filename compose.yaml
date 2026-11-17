@@ -3,6 +3,9 @@ services:
     build: .
     ports:
       - "3000:3000"
+    networks:
+      filament-label-creator:
+        ipv4_address: 172.70.0.10
     restart: unless-stopped
     init: true
     read_only: true
@@ -13,3 +16,12 @@ services:
     security_opt:
       - no-new-privileges:true
     mem_limit: 512m
+
+
+networks:
+  filament-label-creator:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.70.0.0/24
+          gateway: 172.70.0.1
