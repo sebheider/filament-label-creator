@@ -19,13 +19,21 @@ gespeichert. Der Port kann in `compose.yaml` angepasst werden.
 ## Bedienung
 
 1. Labelgröße in Millimetern und Standardfarbe festlegen.
-2. Pro Zeile einen möglichst genauen Produktnamen eintragen. Optional nach einem
-   Semikolon eine eigene Hex-Farbe angeben:
+2. Pro Zeile Hersteller, Filament und Farbe in Worten eintragen – Hex-Werte sind
+   nicht nötig:
    ```text
-   Bambu PLA Basic; #e87939
-   Polymaker PolyLite PLA; #38bdf8
-   eSUN PLA+; #84cc16
+   Prusament PETG schwarz
+   Bambu Lab PLA Basic grau
+   SainSmart TPU blau
+   Elegoo PLA tri color blau/rot/grün
    ```
+   Erkannt werden deutsche und englische Farbwörter (auch `dunkelblau`,
+   `hell grün`, `rote`), mehrere Farben getrennt durch `/`, `,`, `&` oder `und`
+   (bis zu 4 Farben, als Streifen auf dem Label) sowie exakte Farbnamen aus
+   SpoolmanDB (z. B. `Bambu Lab PLA Basic Jade White`). Die Farbe wird vom
+   Filamentnamen getrennt und als Farbbezeichnung aufs Label gedruckt. Weiterhin
+   möglich: `Bambu PLA Basic; #e87939`. Zeilen ohne erkannte Farbe erhalten die
+   Standardfarbe.
 3. Recherche starten. Quellen und Warnungen beachten, Werte bei Bedarf korrigieren
    und die Vorschau aktualisieren.
 4. Einzelne Labels als PNG herunterladen oder alle Labels als PDF exportieren.
@@ -58,10 +66,10 @@ Die Anwendung fragt feste, öffentliche Datenquellen in dieser Reihenfolge ab:
 
 Für SpoolmanDB muss die Eingabe mit dem Markennamen beginnen (z. B.
 `Prusament PETG`, `Bambu Lab PLA Matte`, `MakerBot Tough PLA`,
-`SainSmart GT-3 Matte PLA`). Die Herstellerdatei wird ausschließlich über eine
+`SainSmart GT-3 Matte PLA`; die Schreibweise `Saintsmart` wird ebenfalls erkannt). Die Herstellerdatei wird ausschließlich über eine
 feste Markentabelle ausgewählt. Produktwörter, Material und Effekte (z. B. Matte,
 Silk, Glow) müssen zum Eintrag passen; zusätzlich sind Farbnamen aus der Datenbank
-oder einfache Farbwörter (z. B. „Schwarz“, „Red“) erlaubt. Unbekannte Produktwörter
+oder einfache Farbwörter (z. B. „Schwarz“, „dunkelblau“, „Red“) erlaubt. Unbekannte Produktwörter
 führen nicht zu einem Ersatztreffer, sondern zur nächsten Quelle. Passen mehrere
 Einträge mit abweichenden Werten, erscheint ein Hinweis. Für MakerBot und SainSmart
 wurden keine anderen frei maschinenlesbaren Datenquellen gefunden (weder in

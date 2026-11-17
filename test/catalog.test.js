@@ -142,6 +142,17 @@ test('SpoolmanDB manufacturer data has priority and matches product variants', a
   assert.equal(carbon.nozzle, '275–295 °C');
 });
 
+test('German colour words, compounds and exact database colours are matched', async () => {
+  const { catalog } = fixture({}, spoolmanData);
+  const jade = await catalog.lookup(filament('Bambu Lab PLA Basic Jade White'));
+  assert.deepEqual(jade.matchedColor, { hex: '#ffffff', words: ['jade', 'white'] });
+  const black = await catalog.lookup(filament('Prusament PETG dunkelgrau und schwarz'));
+  assert.equal(black.nozzle, '240–260 °C');
+  assert.equal(black.matchedColor, null);
+  const tpu = await catalog.lookup(filament('Saintsmart TPU blau'));
+  assert.equal(tpu.nozzle, '200–220 °C', 'common misspelling of SainSmart is recognised');
+});
+
 test('unknown product words are not mapped to another product', async () => {
   const { catalog } = fixture({}, spoolmanData);
   const result = await catalog.lookup(filament('Bambu PLA Tough'));

@@ -13,7 +13,9 @@ const editableFields = [
   ["bed", "Druckbett"],
   ["diameter", "Durchmesser"],
   ["density", "Dichte"],
+  ["colorName", "Farbbezeichnung"],
 ];
+const MAX_COLORS = 4;
 let entries = [];
 let busy = false;
 let editVersion = 0;
@@ -125,7 +127,8 @@ function readLabel(entry) {
   editableFields.forEach(([key]) => {
     label[key] = entry.fields[key].value.trim() || null;
   });
-  label.color = entry.fields.color.value;
+  label.colors = entry.colorInputs.map((input) => input.value);
+  label.color = label.colors[0];
   return label;
 }
 
@@ -163,11 +166,12 @@ function markChanged() {
 
 function makeCard(raw, index) {
   const original = {};
-  ["name", "material", "nozzle", "bed", "diameter", "density", "sourceName", "sourceUrl", "matchType", "warning"].forEach((key) => {
+  ["name", "colorName", "material", "nozzle", "bed", "diameter", "density", "sourceName", "sourceUrl", "matchType", "warning"].forEach((key) => {
     original[key] = raw[key] == null ? null : String(raw[key]);
   });
-  original.color = normalizeColor(raw.color, byId("default-color").value);
-  const entry = { original, fields: {}, previewUrl: null };
+  const rawColors = Array.isArray(raw.colors) && raw.colors.length ? raw.colors.slice(0, MAX_COLORS) : [raw.color];
+  original.colors = rawColors.map((color) => normalizeColor(color, byId("default-color").value));
+  const entry = { original, fields: {}, colorInputs: [], previewUrl: null };
   const card = element("article", "label-card");
   const heading = element("div", "card-heading");
   heading.append(element("span", "card-number", `ETIKETT ${String(index + 1).padStart(2, "0")}`));
@@ -185,8 +189,9 @@ function makeCard(raw, index) {
     input.id = id;
     input.type = "text";
     input.maxLength = key === "name" ? 120 : 50;
+    if (key === "colorName") input.placeholder = "z. B. Blau / Rot";
     input.value = original[key] || "";
-    input.placeholder = "k. A.";
+    input.placeholder ||= "k. A.";
     input.required = key === "name";
     input.addEventListener("input", () => {
       input.setCustomValidity("");
@@ -197,15 +202,43 @@ function makeCard(raw, index) {
     grid.append(group);
   });
   const colorGroup = element("div", "edit-field card-color-field");
-  const colorLabel = element("label", "", "Etikettenfarbe");
-  colorLabel.htmlFor = `label-${index}-color`;
-  const color = element("input");
-  color.type = "color";
-  color.id = colorLabel.htmlFor;
-  color.value = original.color;
-  color.addEventListener("input", markChanged);
-  entry.fields.color = color;
-  colorGroup.append(colorLabel, color);
+  const colorLabel = element("span", "color-title", "Etikettenfarben");
+  colorLabel.id = `label-${index}-colors`;
+  const swatches = element("div", "color-swatches");
+  swatches.setAttribute("role", "group");
+  swatches.setAttribute("aria-labelledby", colorLabel.id);
+  const addColor = element("button", "button button-text color-button", "+ Farbe");
+  addColor.type = "button";
+  addColor.setAttribute("aria-label", "Weitere Farbe hinzufügen");
+  const removeColor = element("button", "button button-text color-button", "− Farbe");
+  removeColor.type = "button";
+  removeColor.setAttribute("aria-label", "Letzte Farbe entfernen");
+  const updateColorButtons = () => {
+    addColor.hidden = entry.colorInputs.length >= MAX_COLORS;
+    removeColor.hidden = entry.colorInputs.length <= 1;
+  };
+  const appendColor = (value) => {
+    const color = element("input");
+    color.type = "color";
+    color.value = value;
+    color.setAttribute("aria-label", `Farbe ${entry.colorInputs.length + 1}`);
+    color.addEventListener("input", markChanged);
+    entry.colorInputs.push(color);
+    swatches.append(color);
+    updateColorButtons();
+  };
+  original.colors.forEach(appendColor);
+  addColor.addEventListener("click", () => {
+    appendColor(entry.colorInputs.at(-1).value);
+    markChanged();
+  });
+  removeColor.addEventListener("click", () => {
+    entry.colorInputs.pop().remove();
+    updateColorButtons();
+    markChanged();
+  });
+  swatches.append(removeColor, addColor);
+  colorGroup.append(colorLabel, swatches);
   grid.append(colorGroup);
   card.append(grid);
   const source = element("p", "source-line");
@@ -277,13 +310,11 @@ lookupForm.addEventListener("submit", (event) => {
     if (!lines.length) throw new Error("Bitte gib mindestens ein Filament ein.");
     if (lines.length > 30) throw new Error("Bitte gib höchstens 30 Filamente auf einmal ein.");
     const filaments = lines.map((line, index) => {
-      const [name, color, ...extra] = line.split(";").map((part) => part.trim());
-      if (!name || extra.length || (color !== undefined && !/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(color))) {
-        throw new Error(`Bitte prüfe Zeile ${index + 1}: Filamentname; #HEX-Farbe (z. B. #e87939).`);
-      }
-      return { name, color: normalizeColor(color, byId("default-color").value) };
+      if (line.length > 160) throw new Error(`Zeile ${index + 1} ist zu lang (maximal 160 Zeichen).`);
+      return { name: line };
     });
-    const response = await request("/api/lookup", { filaments, ...size }, "json");
+    const defaultColor = byId("default-color").value;
+    const response = await request("/api/lookup", { filaments, defaultColor, ...size }, "json");
     if (!response || !Array.isArray(response.labels) || !response.labels.length ||
         response.labels.length > 30 || response.labels.some((label) => !label || typeof label !== "object" || Array.isArray(label))) {
       throw new Error("Der Server hat keine gültigen Etiketten geliefert. Bitte versuche es erneut.");

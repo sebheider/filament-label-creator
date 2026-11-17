@@ -3,7 +3,8 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import { createCatalog } from './lib/catalog.js';
-import { InputError, validateLabel, validateList, validateSize, renderPng, renderPdf } from './lib/labels.js';
+import { InputError, validateFilaments, validateLabel, validateList, validateSize, renderPng, renderPdf } from './lib/labels.js';
+import { normalizeHex, parseFilament, withCatalogColor } from './lib/colors.js';
 
 const catalog = createCatalog();
 const assets = new Map([
@@ -74,11 +75,23 @@ export function createApp(lookup = filament => catalog.lookup(filament)) {
       const body = await jsonBody(request);
       const { width, height } = validateSize(body);
       if (pathname === '/api/lookup') {
-        const filaments = validateList(body.filaments);
+        const filaments = validateFilaments(body.filaments);
+        const defaultColor = normalizeHex(body.defaultColor) ?? '#e87939';
+        const describe = async filament => {
+          const parsed = parseFilament(filament.name, filament.color);
+          const { matchedColor, ...found } = await lookup({ name: parsed.query, color: parsed.colors[0] ?? defaultColor });
+          const { product, colors, colorName, unknownColor } = withCatalogColor(parsed, matchedColor);
+          const hint = unknownColor ? `Farbe „${unknownColor}“ nicht erkannt – bitte Etikettenfarbe wählen.` : null;
+          const label = { ...found, name: product.slice(0, 120), colors: colors.length ? colors : [defaultColor],
+            colorName: colorName?.slice(0, 50) ?? null };
+          label.color = label.colors[0];
+          if (hint) label.warning = [hint, found.warning].filter(Boolean).join(' ');
+          return label;
+        };
         const labels = [];
         // Sequential batches bound outbound traffic and share the catalog cache.
         for (let i = 0; i < filaments.length; i += 3) {
-          labels.push(...await Promise.all(filaments.slice(i, i + 3).map(lookup)));
+          labels.push(...await Promise.all(filaments.slice(i, i + 3).map(describe)));
         }
         return send(200, { labels, width, height });
       }
