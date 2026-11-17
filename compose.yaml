@@ -1,0 +1,15 @@
+services:
+  filament-label-creator:
+    build: .
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 512m

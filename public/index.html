@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f7f3">
+    <title>Spulenwerk · Filament-Etiketten</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Spulenwerk Startseite">
+        <span class="brand-mark" aria-hidden="true"><span></span></span>
+        <span>spulenwerk<span class="brand-dot">.</span></span>
+      </a>
+      <span class="header-note"><span class="status-dot"></span> Ordnung auf jeder Rolle</span>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <div class="eyebrow"><span></span> DEIN FILAMENT. KLAR BESCHRIFTET.</div>
+        <h1 id="page-title">Mehr Überblick.<br><span>Weniger Rätselraten.</span></h1>
+        <p>Mach aus deinen Filamenten übersichtliche Etiketten – mit Materialdaten, deiner Farbe und genau dem richtigen Format.</p>
+        <div class="intro-tags"><span>Für jede Spule</span><span>PNG &amp; A4-PDF</span><span>Ohne Anmeldung</span></div>
+      </section>
+
+      <div class="workspace">
+        <section class="panel input-panel" aria-labelledby="input-title">
+          <div class="section-heading">
+            <span class="step-number">01</span>
+            <div><h2 id="input-title">Deine Filamente</h2><p>Eine Zeile, ein Etikett.</p></div>
+          </div>
+          <form id="lookup-form">
+            <label for="filaments">Filamentliste <span class="label-aside">max. 30</span></label>
+            <textarea id="filaments" name="filaments" rows="7" placeholder="Bambu PLA Basic; #e87939&#10;Prusament PETG&#10;Polymaker PolyTerra PLA" aria-describedby="filaments-help" required></textarea>
+            <div class="field-help" id="filaments-help">Hersteller und Filamentname eingeben. Optional: <code>; #HEX-Farbe</code> pro Zeile.</div>
+            <div class="color-row">
+              <div><label for="default-color">Standardfarbe</label><p>Für Zeilen ohne eigene Farbe</p></div>
+              <div class="color-control"><input id="default-color" type="color" value="#e87939" aria-label="Standardfarbe auswählen"><span id="color-value">#E87939</span></div>
+            </div>
+            <fieldset class="dimensions">
+              <legend>Etikettenformat</legend>
+              <div class="dimension-fields">
+                <div><label for="label-width">Breite</label><div class="unit-input"><input id="label-width" name="width" type="number" value="70" min="30" max="190" step="0.1" required><span>mm</span></div></div>
+                <span class="dimension-times" aria-hidden="true">×</span>
+                <div><label for="label-height">Höhe</label><div class="unit-input"><input id="label-height" name="height" type="number" value="40" min="20" max="277" step="0.1" required><span>mm</span></div></div>
+              </div>
+              <p class="field-help">Breite 30–190 mm · Höhe 20–277 mm<br>A4-Export mit 10 mm Seitenrand.</p>
+            </fieldset>
+            <button type="submit" class="button button-primary full-width" id="lookup-button"><span>Etiketten erstellen</span><span aria-hidden="true">↗</span></button>
+            <p class="submit-note">Daten finden. Anpassen. Ausdrucken.</p>
+          </form>
+        </section>
+
+        <section class="results-panel" aria-labelledby="results-title" id="results-panel" aria-busy="false">
+          <div class="results-heading">
+            <div class="section-heading"><span class="step-number">02</span><div><h2 id="results-title">Deine Etiketten <span id="label-count" class="count-badge">0</span></h2><p>Prüfen, anpassen &amp; mitnehmen.</p></div></div>
+            <span class="format-badge" id="format-badge">70 × 40 mm</span>
+          </div>
+
+          <div id="empty-state" class="empty-state">
+            <div class="sample-stack" aria-hidden="true">
+              <div class="sample-back"></div>
+              <div class="sample-label">
+                <div class="sample-top"><span class="sample-color"></span><span>FILAMENT / 001</span></div>
+                <strong>PLA Basic</strong><span class="sample-brand">BAMBU LAB</span>
+                <div class="sample-rule"></div>
+                <div class="sample-values"><span>DÜSE<strong>190–230 °C</strong></span><span>BETT<strong>35–45 °C</strong></span></div>
+              </div>
+              <span class="sample-spark">✳</span>
+            </div>
+            <h3>Deine nächste Rolle hat einen Namen.</h3>
+            <p>Trage links deine Filamente ein.<br>Hier werden daraus deine persönlichen Etiketten.</p>
+            <span class="empty-hint">← Leg mit deiner Filamentliste los</span>
+          </div>
+
+          <div id="results-content" hidden>
+            <div class="export-bar">
+              <p id="preview-hint">Alle Angaben sind direkt editierbar.</p>
+              <button type="button" class="button button-dark" id="pdf-button">↓ A4-PDF herunterladen</button>
+            </div>
+            <form id="labels-form" aria-label="Etiketten bearbeiten"><div id="label-list" class="label-list"></div></form>
+            <p class="preview-note">Vorschauen werden nur auf Knopfdruck erzeugt. PNG und PDF verwenden immer deine aktuellen Eingaben.</p>
+          </div>
+        </section>
+      </div>
+
+      <div id="error-message" class="error-message" role="alert" tabindex="-1" hidden></div>
+      <p id="status-message" class="status-message" role="status" aria-live="polite"></p>
+
+      <aside class="notice"><span class="notice-icon" aria-hidden="true">i</span><p><strong>Gut beschriftet. Bewusst gedruckt.</strong> Material- und Druckwerte sind Orientierungshilfen aus Slicer-Profilen, keine garantierten Herstellerangaben. Bitte prüfe alle Werte vor dem Drucken und passe sie an deinen Drucker an.</p></aside>
+
+      <section class="how-to" aria-labelledby="how-to-title">
+        <div class="how-to-intro"><span class="eyebrow">VON DER LISTE AN DIE SPULE</span><h2 id="how-to-title">In drei kleinen Schritten.</h2></div>
+        <div class="how-step"><span>01 /</span><h3>Filamente eintragen</h3><p>Namen und optional eine Farbe ergänzen. Auch mehrere auf einmal.</p></div>
+        <div class="how-step"><span>02 /</span><h3>Details feinjustieren</h3><p>Gefundene Daten prüfen und deine Etiketten nach Wunsch bearbeiten.</p></div>
+        <div class="how-step"><span>03 /</span><h3>Drucken &amp; aufkleben</h3><p>Einzeln als PNG oder zusammen als druckfertiges A4-PDF exportieren.</p></div>
+      </section>
+    </main>
+    <footer><a class="footer-brand" href="/">spulenwerk.</a><span>Kleine Etiketten. Große Ordnung.</span><span>Gemacht für deinen 3D-Druck-Alltag.</span></footer>
+  </body>
+</html>
